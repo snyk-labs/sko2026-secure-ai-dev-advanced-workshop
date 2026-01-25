@@ -1,0 +1,22 @@
+{
+  "name": "secure-ai-dev-advanced-workshop",
+  "version": "1.0.0",
+  "description": "Starter project for the Secure AI Development Advanced (201) workshop",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [
+    "workshop",
+    "cursor",
+    "ai",
+    "security",
+    "snyk"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure AI Dev Workshop</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+    }
+
+    .container {
+      text-align: center;
+      padding: 2rem;
+      max-width: 600px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, #e94560, #ff6b6b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: #a0a0a0;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-top: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: #e94560;
+    }
+
+    .card p {
+      color: #c0c0c0;
+      line-height: 1.6;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      color: #00ff88;
+      margin-top: 1.5rem;
+    }
+
+    .status::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #00ff88;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    footer {
+      position: fixed;
+      bottom: 1rem;
+      color: #606060;
+      font-size: 0.875rem;
+    }
+
+    a {
+      color: #e94560;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hello, World!</h1>
+    <p class="subtitle">Secure AI Development Advanced (201) Workshop</p>
+    
+    <div class="card">
+      <h2>Welcome to the Workshop</h2>
+      <p>
+        This is your starter Express.js application. During this workshop, 
+        you'll use Cursor's AI agents to add features like user authentication, 
+        middleware, and more - all while following security best practices 
+        defined in AGENTS.md.
+      </p>
+    </div>
+
+    <div class="status">
+      Server is running
+    </div>
+  </div>
+
+  <footer>
+    Powered by <a href="https://cursor.com" target="_blank">Cursor</a> + <a href="https://snyk.io" target="_blank">Snyk</a>
+  </footer>
+</body>
+</html>
