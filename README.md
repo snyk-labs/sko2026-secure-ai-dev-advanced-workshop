@@ -1,248 +1,182 @@
 # Secure AI Development Advanced (201) Workshop
 
-Welcome to the Secure AI Development Advanced workshop! In this hands-on session, you'll learn advanced techniques for building applications with AI coding assistants while maintaining security best practices.
+In this workshop, you use AI coding agents in Cursor to add features to a small Express app. You also learn how to keep the generated code secure.
 
-## Workshop Overview
+**Time:** 30 minutes
+**Level:** Intermediate. You must finish the Secure AI Development Foundations (101) workshop first.
 
-**Duration**: 30 minutes  
-**Level**: Intermediate (requires completion of 101 workshop)
+## What you will learn
 
-### What You'll Learn
-
-1. **AGENTS.md** - How to use the open-standard AGENTS.md file to automatically enforce code quality, security, and compliance guidelines
-2. **Cloud Agents** - When to use Cursor's Cloud Agents vs. local agents, and the security implications of each
-3. **Best-of-N** - How to run the same prompt across multiple AI models in parallel to compare outputs and pick the best solution
-
----
+1. **AGENTS.md:** How to use an `AGENTS.md` file to give coding agents your rules for code quality, security, and compliance.
+2. **Cloud Agents:** When to use Cursor Cloud Agents and when to use local agents. You also learn the security risks of each.
+3. **Best-of-N:** How to run one prompt on several AI models at the same time, and then pick the best result.
 
 ## Prerequisites
 
-Before starting, make sure you have:
+- [Cursor](https://cursor.com) installed
+- The Snyk extension installed in Cursor
+- [Node.js](https://nodejs.org) 18 or later, with npm
+- The 101 workshop finished
 
-- [ ] **Cursor** installed ([download](https://cursor.com))
-- [ ] **Snyk Extension** installed in Cursor
-- [ ] **Node.js** (v18 or later) and npm installed
-- [ ] Completed the **Secure AI Development Foundations (101)** workshop
+## Setup
 
----
+1. Clone the repository and open the folder:
 
-## Getting Started
+   ```bash
+   git clone https://github.com/snyk-labs/sko2026-secure-ai-dev-advanced-workshop.git
+   cd sko2026-secure-ai-dev-advanced-workshop
+   ```
 
-### 1. Clone the Repository
+2. Install the dependencies:
 
-```bash
-git clone <repository-url>
-cd secure-ai-dev-advanced-workshop
-```
+   ```bash
+   npm install
+   ```
 
-### 2. Install Dependencies
+3. Start the server:
 
-```bash
-npm install
-```
+   ```bash
+   npm start
+   ```
 
-### 3. Start the Server
+4. Open [http://localhost:3000](http://localhost:3000). You see a "Hello, World!" page.
 
-```bash
-npm start
-```
+5. Open [http://localhost:3000/api/health](http://localhost:3000/api/health). You see a JSON response with `"status": "ok"`.
 
-### 4. Verify It's Working
+To use a different port, set the `PORT` variable, for example `PORT=3001 npm start`.
 
-Open your browser to [http://localhost:3000](http://localhost:3000) - you should see the "Hello, World!" page.
+To restart the server automatically when files change, run `npm run dev`.
 
-You can also check the health endpoint: [http://localhost:3000/api/health](http://localhost:3000/api/health)
+The app has one API route, `GET /api/health`. The files in `src/public` are served as static files. The exercises below add more routes in `src/index.js`.
 
----
+## Section 1: AGENTS.md
 
-## Section 1: Using AGENTS.md to Improve Code Quality
+`AGENTS.md` is a Markdown file in the root of a project. It contains instructions for AI coding agents. Agents such as Cursor read it and follow it. Many other tools also support it. Because it is a plain file, you can keep it in version control with your code.
 
-### What is AGENTS.md?
+Open `AGENTS.md` in this project. It has these sections:
 
-AGENTS.md is an open-standard Markdown file that provides instructions to AI coding agents. When placed at the root of your project, agents like Cursor will automatically read and follow these guidelines.
+- **Code Quality Standards:** JSDoc comments, `async`/`await`, input validation, unit tests
+- **Security Guidelines:** no logging of sensitive data, parameterized queries, password hashing
+- **Compliance Guidelines:** no GPL-licensed dependencies
+- **Project Structure** and **Error Handling**
 
-**Key benefits:**
-- Works across multiple AI tools (Cursor, Windsurf, Kilo Code, etc.)
-- Simple Markdown format - no special syntax
-- Version-controlled alongside your code
-- Team-wide consistency
+### Exercise 1: See AGENTS.md in action
 
-### Explore the AGENTS.md File
+1. Open the Cursor agent and enter this prompt:
 
-Open `AGENTS.md` in this project. Notice the different sections:
+   ```text
+   Add a user registration endpoint at POST /api/register that accepts email and password, validates the input, and returns a user object with an ID
+   ```
 
-- **Code Quality Standards** - JSDoc comments, async/await, input validation
-- **Security Guidelines** - No logging sensitive data, parameterized queries
-- **Compliance Guidelines** - License restrictions (no GPL)
+2. Look at the code that the agent writes. Check for these items:
+   - JSDoc comments on the functions
+   - Validation of the input
+   - No logging of the password
+   - `async`/`await` instead of `.then()`
 
-### Exercise: See AGENTS.md in Action
+3. Enter a second prompt:
 
-Try this prompt in Cursor's agent:
+   ```text
+   Add a password reset endpoint at POST /api/reset-password that accepts an email address, validates it, and returns a success message
+   ```
 
-```
-Add a user registration endpoint at POST /api/register that accepts email and password, validates the input, and returns a user object with an ID
-```
+4. Check the new code against the same list.
 
-**Watch for:**
-- Automatic JSDoc comments
-- Input validation
-- No password logging
-- Async/await usage
+## Section 2: Cloud Agents and security
 
-### Your Turn
+Cursor has two kinds of agents:
 
-Try adding another endpoint:
+| Agent | Where it runs | Notes |
+|-------|---------------|-------|
+| Main agent and local subagents | Your computer | Can use your extensions (such as Snyk), `AGENTS.md`, and local MCP servers |
+| Cloud Agents | A virtual machine in Cursor's cloud | Cannot use your local extensions or local MCP servers. Might not follow `AGENTS.md` (known issue) |
 
-```
-Add a password reset endpoint at POST /api/reset-password that accepts an email address, validates it, and returns a success message
-```
+Use a local agent when:
 
----
+- You want real-time Snyk scans in the IDE.
+- You need `AGENTS.md` to be followed.
+- You work in an interactive session.
 
-## Section 2: Cloud Agents and Security Implications
+Use a Cloud Agent when:
 
-### Types of Agents in Cursor
+- The task takes a long time (30 minutes or more).
+- You want to close your laptop while the agent works.
+- The task runs many tests.
+- Your pull requests are scanned by Snyk in your pipeline.
 
-| Agent Type | Where It Runs | Security Features |
-|------------|---------------|-------------------|
-| **Main Agent** | Your laptop | Full access to extensions, AGENTS.md, MCP |
-| **Local Subagents** | Your laptop (parallel) | Same as main agent |
-| **Cloud Agents** | Cursor's AWS VMs | Limited - no extensions, AGENTS.md has known issues |
+**Risk:** A Cloud Agent has no access to your Snyk extension. The code it writes is not scanned in your IDE.
 
-### When to Use Each
+To reduce this risk, add scans after the agent finishes:
 
-**Use Local Agents when:**
-- You need real-time Snyk scanning
-- You want AGENTS.md enforced
-- Interactive coding sessions
+1. **Pull request scans:** Connect Snyk to your GitHub or GitLab pull request checks.
+2. **CI pipeline:** Run `snyk code test` and `snyk test` in CI.
+3. **Bugbot:** Use Cursor's Bugbot to review pull requests automatically.
 
-**Use Cloud Agents when:**
-- Long-running tasks (30+ minutes)
-- You want to close your laptop
-- Heavy CI/test runs
-- **AND** you have Snyk in your PR/CI pipeline
+## Section 3: Best-of-N
 
-### Critical Security Consideration
+Best-of-N runs the same prompt on several models at the same time. Each model works in its own git worktree. You compare the results and apply the one you like best.
 
-Cloud Agents run in isolated VMs and do **NOT** have access to:
-- Your local Cursor extensions (including Snyk)
-- Your AGENTS.md file (known bug)
-- MCP servers configured locally
+### Exercise 2: Try Best-of-N
 
-**This means code generated by Cloud Agents bypasses IDE-level security scanning.**
+1. Write this prompt in the agent input. Do not send it yet.
 
-### Defense-in-Depth Recommendation
+   ```text
+   Create a rate limiting middleware that limits requests to 100 per minute per IP address
+   ```
 
-When using Cloud Agents, implement additional security layers:
+2. Click the **1x** button next to the model selector.
+3. Select **Multiple models**.
+4. Choose two or three models from different providers.
+5. Send the prompt.
+6. Compare the results side by side. Ask yourself:
+   - Which code is easiest to read?
+   - Which code handles edge cases best?
+   - Which code would you use in production?
+7. Click **Apply** on the best result.
 
-1. **PR-Level Scanning**: Integrate Snyk into GitHub/GitLab PR checks
-2. **CI/CD Pipeline**: Run `snyk code test` and `snyk test` in CI
-3. **Bugbot**: Use Snyk's Bugbot for automated PR security review
+Best-of-N helps most with hard problems and security-critical code. Different models take different approaches and find different issues.
 
----
+## Key takeaways
 
-## Section 3: Best-of-N - Multiple Models for Better Output
-
-### What is Best-of-N?
-
-Best-of-N lets you run the same prompt across multiple AI models in parallel. Each model works in its own isolated git worktree, and you can compare the results side-by-side to pick the best solution.
-
-### How to Use Best-of-N
-
-1. Write your prompt in the agent input
-2. Click the **"1x"** button next to the model selector
-3. Select **"Multiple models"**
-4. Choose which models to run (e.g., Claude, GPT-4, Gemini)
-5. Submit the prompt
-6. Compare the output cards side-by-side
-7. Click **"Apply"** on the best result
-
-### When to Use Best-of-N
-
-| Use Case | Why It Helps |
-|----------|--------------|
-| Hard problems | Different models take different approaches |
-| Security-critical code | Multiple "reviewers" catch different issues |
-| Comparing code quality | See which model writes cleaner code |
-| Learning model strengths | Understand which models work best for your codebase |
-
-### Exercise: Try Best-of-N
-
-Use Best-of-N with 2-3 models on this prompt:
-
-```
-Create a rate limiting middleware that limits requests to 100 per minute per IP address
-```
-
-**Compare the outputs:**
-- Which solution is most readable?
-- Which handles edge cases better?
-- Which would you choose for production?
-
----
-
-## Key Takeaways
-
-1. **AGENTS.md** provides a simple, portable way to enforce code quality and security standards across your team
-
-2. **Cloud Agents** are powerful for async work, but bypass IDE security - always have Snyk in your PR/CI pipeline as backup
-
-3. **Best-of-N** improves output quality by comparing multiple model approaches, especially for hard or security-critical problems
-
----
+- `AGENTS.md` gives every agent and every team member the same rules.
+- Cloud Agents skip your IDE checks. Always scan pull requests with Snyk.
+- Best-of-N lets you compare several answers before you choose one.
 
 ## Troubleshooting
 
-### Server won't start
+**The server does not start**
 
-```bash
-# Make sure you're in the right directory
-cd secure-ai-dev-advanced-workshop
+1. Make sure you are in the project folder.
+2. Reinstall the dependencies:
 
-# Reinstall dependencies
-rm -rf node_modules
-npm install
+   ```bash
+   rm -rf node_modules
+   npm install
+   ```
 
-# Start the server
-npm start
-```
+3. Start the server again with `npm start`.
 
-### AGENTS.md not being followed
+If the port is already in use, start the server on another port, for example `PORT=3001 npm start`.
 
-- Verify the file is named exactly `AGENTS.md` (uppercase)
-- Check it's in the project root directory
-- Start a new agent session
+**The agent does not follow AGENTS.md**
 
-### Snyk extension not scanning
+- Make sure the file is named `AGENTS.md` (uppercase) and is in the project root.
+- Start a new agent session.
+- Use a local agent. Cloud Agents might not read the file.
 
-1. Open Extensions panel (Cmd/Ctrl+Shift+X)
-2. Search for "Snyk" and verify it's installed
-3. Authenticate: Cmd/Ctrl+Shift+P → "Snyk: Authenticate"
+**The Snyk extension does not scan**
 
-### Best-of-N not showing multiple options
+1. Open the Extensions panel (Cmd/Ctrl+Shift+X).
+2. Search for "Snyk" and make sure it is installed.
+3. Press Cmd/Ctrl+Shift+P and run **Snyk: Authenticate**.
 
-- Ensure you clicked "1x" and selected "Multiple models"
-- Some models may require specific subscription tiers
-- Check your Cursor plan supports parallel agents
+**Best-of-N shows only one option**
 
----
+- Make sure you clicked **1x** and selected **Multiple models**.
+- Some models need a specific Cursor plan.
 
-## Additional Resources
+## More information
 
-- [Cursor Documentation](https://cursor.com/docs)
-- [AGENTS.md Specification](https://agents.md/)
-- [Snyk Documentation](https://docs.snyk.io)
-- [Snyk + Cursor Integration](https://snyk.io/integrations)
-
----
-
-## Next Steps
-
-After this workshop, consider:
-
-1. Adding AGENTS.md to your own projects
-2. Setting up Snyk in your CI/CD pipeline
-3. Experimenting with Best-of-N on complex refactoring tasks
-4. Sharing these techniques with your team
-
-Happy coding! 🚀
+- [Cursor documentation](https://cursor.com/docs)
+- [AGENTS.md specification](https://agents.md/)
+- [Snyk documentation](https://docs.snyk.io)
